@@ -1,0 +1,15 @@
+[package]
+name = "bastard"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+    "bastard_backend",
+    "bastard_frontend",
+    "bastard_core",
+]
+
+[dependencies]
+bastard_backend = { path = "bastard_backend" }
+bastard_core = { path = "bastard_core" }
