@@ -20,6 +20,7 @@ version = "0.1.0"
 dependencies = [
  "bastard_backend",
  "bastard_core",
+ "bastard_frontend",
 ]
 
 [[package]]
@@ -40,6 +41,9 @@ version = "0.1.0"
 [[package]]
 name = "bastard_frontend"
 version = "0.1.0"
+dependencies = [
+ "bastard_core",
+]
 
 [[package]]
 name = "bitflags"

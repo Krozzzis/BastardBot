@@ -12,4 +12,5 @@ members = [
 
 [dependencies]
 bastard_backend = { path = "bastard_backend" }
+bastard_frontend = { path = "bastard_frontend" }
 bastard_core = { path = "bastard_core" }

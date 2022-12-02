@@ -19,7 +19,6 @@ impl Parser {
 impl TableGenerator for Parser {
     fn get_table(&self, group: Group, weekday: DayOfWeek) -> Result<Table, ()> {
         let url = self.get_request_url(group, weekday);
-        println!("{}", url);
         let body = reqwest::blocking::get(&url).expect("Oops, get error").text().unwrap();
         let raw_table: RawTable = serde_json::from_str(&body).expect("Oops, parse error");
         Ok(raw_table.to_table())

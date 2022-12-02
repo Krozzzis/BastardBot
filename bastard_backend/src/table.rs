@@ -18,7 +18,7 @@ pub struct RawTable {
 
 impl RawTable {
     pub fn to_table(&self) -> Table {
-        let mut new = self.lessons.clone();
+        let new = self.lessons.clone();
 
         let mut table = Table::new();
         for i in 1..=7 {
