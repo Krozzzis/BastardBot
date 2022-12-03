@@ -3,6 +3,7 @@ use bastard_core::lesson::{Lesson, LessonFormatter};
 
 pub struct SimpleFormatter {
     lesson_formatter: Box<dyn LessonFormatter>,
+    timetable: Vec<(String, String)>,
 }
 pub struct SimpleLessonFormatter {}
 
@@ -37,14 +38,23 @@ impl LessonFormatter for SimpleLessonFormatter {
 }
 
 impl SimpleFormatter {
-    pub fn new() -> Self {
+    pub fn new(timetable: Vec<(String, String)>) -> Self {
         Self {
-            lesson_formatter: Box::new(SimpleLessonFormatter{})
+            lesson_formatter: Box::new(SimpleLessonFormatter{}),
+            timetable: timetable,
         }
     }
 
     fn format_line(&self, indentation: &str, changed: &str, lesson: Option<&Lesson>) -> String {
         format!("{} {}{}\n", indentation, changed, self.lesson_formatter.format_lesson(lesson))
+    }
+
+    fn format_timetable(&self, place: i32) -> String {
+        if let Some((a, b)) = self.timetable.get((place-1) as usize) {
+            format!("[{}-{}]", a, b)
+        } else {
+            String::from("")
+        }
     }
 }
 
@@ -53,7 +63,7 @@ impl ScheduleTableFormatter for SimpleFormatter {
         let mut output = String::new();
 
         for (i, entry) in (&table.entries).iter().enumerate() {
-            output += format!("{} Урок:\n", i+1).as_str();
+            output += format!("{} Урок{}:\n", i+1, self.format_timetable(i as i32+1).as_str()).as_str();
             let changed_char = if let None = table.replaced[i] {
                 " "
             } else {
