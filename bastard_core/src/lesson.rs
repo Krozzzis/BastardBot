@@ -6,5 +6,5 @@ pub struct Lesson {
 }
 
 pub trait LessonFormatter {
-    fn format_lesson(&self, lesson: &Lesson) -> String;
+    fn format_lesson(&self, lesson: Option<&Lesson>) -> String;
 }

@@ -1,10 +1,50 @@
 use bastard_core::schedule_table::{ScheduleTable, ScheduleTableFormatter, Entry};
+use bastard_core::lesson::{Lesson, LessonFormatter};
 
-pub struct SimpleFormatter {}
+pub struct SimpleFormatter {
+    lesson_formatter: Box<dyn LessonFormatter>,
+}
+pub struct SimpleLessonFormatter {}
+
+impl LessonFormatter for SimpleLessonFormatter {
+    fn format_lesson(&self, lesson: Option<&Lesson>) -> String {
+        let mut output = String::new();
+
+        if let Some(lesson) = lesson {
+            if !lesson.name.is_empty() {
+                output += lesson.name.as_str();
+            } else {
+                output += "-";
+            }
+
+            if !lesson.auditory.is_empty() {
+                output += format!("[{}], ", lesson.auditory).as_str();
+            } else {
+                output += "[-], ";
+            }
+
+            if !lesson.teacher.is_empty() {
+                output += lesson.teacher.as_str();
+            } else {
+                output += "-";
+            }
+        } else {
+            output += "Нет";
+        }
+
+        output
+    }
+}
 
 impl SimpleFormatter {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            lesson_formatter: Box::new(SimpleLessonFormatter{})
+        }
+    }
+
+    fn format_line(&self, indentation: &str, changed: &str, lesson: Option<&Lesson>) -> String {
+        format!("{} {}{}\n", indentation, changed, self.lesson_formatter.format_lesson(lesson))
     }
 }
 
@@ -14,30 +54,31 @@ impl ScheduleTableFormatter for SimpleFormatter {
 
         for (i, entry) in (&table.entries).iter().enumerate() {
             output += format!("{} Урок:\n", i+1).as_str();
-            let changed: bool = if let None = table.replaced[i] {
-                false
+            let changed_char = if let None = table.replaced[i] {
+                " "
             } else {
-                true
+                "*"
             };
             match entry {
                 Entry::NoLessons => {
-                    output += format!(" {}Нет\n", if changed {"*"} else {" "}).as_str();
+                    output += self.format_line(" ", changed_char, None).as_str();
                 },
                 Entry::OneLesson(lesson) => {
-                    output += format!("└ {}{}[{}] - {}\n", if changed {"*"} else {" "}, lesson.name, lesson.auditory, lesson.teacher).as_str();
+                    output += self.format_line("└", changed_char, Some(&lesson)).as_str();
                 },
                 Entry::MultiLessons(list) => {
                     let last_pos = list.len() - 1;
                     for (pos, lesson) in list.iter().enumerate() {
-                        if pos == last_pos {
-                            output += "└ ";
+                        let indentation = if pos == last_pos {
+                            "└"
                         } else {
-                            output += "├ ";
-                        }
+                            "├"
+                        };
+
                         if let Some(a) = lesson {
-                            output += format!(" {}{}[{}] - {}\n", if changed {"*"} else {" "}, a.name, a.auditory, a.teacher).as_str();
+                            output += self.format_line(indentation, changed_char, Some(&a)).as_str();
                         } else {
-                            output += format!(" {}Нет\n", if changed {"*"} else {" "}).as_str();
+                            output += self.format_line(indentation, changed_char, None).as_str();
                         }
                     }
                 },

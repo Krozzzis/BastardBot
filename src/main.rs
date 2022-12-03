@@ -5,7 +5,7 @@ use bastard_core::schedule_table::{ScheduleTableGenerator, ScheduleTableFormatte
 
 fn main() {
     let parser = WebParser::new("https://lyceum.urfu.ru/".to_string());
-    let table = parser.get_table(Group::_11N, DayOfWeek::Thursday).expect("Ooh, error");
+    let table = parser.get_table(Group::_11N, DayOfWeek::Saturday).expect("Ooh, error");
     let formatter = SimpleFormatter::new();
     let output = formatter.format(&table);
     println!("{}", output);
