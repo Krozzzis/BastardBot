@@ -12,16 +12,23 @@ pub enum Entry {
 #[derive(Debug, Clone)]
 pub struct ScheduleTable {
     pub entries: Vec<Entry>, 
+    pub replaced: Vec<Option<Entry>>,
 }
 
 impl ScheduleTable  {
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
+            replaced: Vec::new(),
         }
     }
+
     pub fn add_entry(&mut self, entry: Entry) {
         self.entries.push(entry);
+    }
+
+    pub fn add_replaced(&mut self, entry: Option<Entry>) {
+        self.replaced.push(entry);
     }
 }
 
