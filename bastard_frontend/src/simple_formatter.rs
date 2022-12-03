@@ -21,17 +21,21 @@ impl ScheduleTableFormatter for SimpleFormatter {
                 Entry::OneLesson(lesson) => {
                     output += format!("{}[{}] - {}\n", lesson.name, lesson.auditory, lesson.teacher).as_str();
                 },
-                Entry::TwoLessons(one, two) => {
-                    if let Some(a) = one {
-                        output += format!("{}[{}] - {}\n", a.name, a.auditory, a.teacher).as_str();
-                    } else {
-                        output += "Нет\n";
-                    }
-
-                    if let Some(a) = two {
-                        output += format!("{}[{}] - {}\n", a.name, a.auditory, a.teacher).as_str();
-                    } else {
-                        output += "Нет\n";
+                Entry::MultiLessons(list) => {
+                    let last_pos = list.len() - 1;
+                    for (pos, lesson) in list.iter().enumerate() {
+                        if pos == 0 {
+                            output += "├ ";
+                        } else if pos == last_pos {
+                            output += "└ ";
+                        } else {
+                            output += "├ ";
+                        }
+                        if let Some(a) = lesson {
+                            output += format!("{}[{}] - {}\n", a.name, a.auditory, a.teacher).as_str();
+                        } else {
+                            output += "Нет\n";
+                        }
                     }
                 },
                 Entry::Other(text) => {

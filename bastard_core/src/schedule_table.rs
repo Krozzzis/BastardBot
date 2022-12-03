@@ -5,7 +5,7 @@ use super::request_params::{DayOfWeek, Group};
 pub enum Entry {
     NoLessons,
     OneLesson(Lesson),
-    TwoLessons(Option<Lesson>, Option<Lesson>),
+    MultiLessons(Vec<Option<Lesson>>),
     Other(String),
 }
 

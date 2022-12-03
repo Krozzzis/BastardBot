@@ -26,6 +26,7 @@ impl RawTable {
         }
         let min_place: i32 = self.lessons.iter().min_by(|a, b| a.number.cmp(&b.number)).unwrap().number;
         let max_place: i32 = self.lessons.iter().max_by(|a, b| a.number.cmp(&b.number)).unwrap().number;
+
         for place in min_place..=max_place {
             let lessons: Vec<&RawLesson> = self.lessons
                 .iter()
@@ -45,35 +46,30 @@ impl RawTable {
                         replacing: None,
                     };
                     match lesson.subgroup {
-                        1 => Entry::TwoLessons(Some(one), None),
-                        2 => Entry::TwoLessons(None, Some(one)),
+                        1 => Entry::MultiLessons(vec![Some(one), None]),
+                        2 => Entry::MultiLessons(vec![None, Some(one)]),
                         _ => Entry::OneLesson(one),
                     }
                 },
-                2 => {
-                    let lesson = lessons[0];
-                    let one = Lesson {
-                        name: lesson.subject.clone(),
-                        teacher: lesson.teacher.clone(),
-                        auditory: lesson.auditory.clone(),
-                        replacing: None,
-                    };
+                _ => {
+                    let mut list: Vec<Option<Lesson>> = Vec::new();
+                    let max_subgroup: usize = lessons.iter().max_by(|a, b| a.subgroup.cmp(&b.subgroup)).unwrap().subgroup as usize;
 
-                    let lesson = lessons[1];
-                    let two = Lesson {
-                        name: lesson.subject.clone(),
-                        teacher: lesson.teacher.clone(),
-                        auditory: lesson.auditory.clone(),
-                        replacing: None,
-                    };
-
-                    if lessons[0].subgroup > lessons[1].subgroup {
-                        Entry::TwoLessons(Some(two), Some(one))
-                    } else {
-                        Entry::TwoLessons(Some(one), Some(two))
+                    for subgroup in 1..=max_subgroup {
+                        if let Some(lesson) = lessons.get(subgroup) {
+                            let one = Lesson {
+                                name: lesson.subject.clone(),
+                                teacher: lesson.teacher.clone(),
+                                auditory: lesson.auditory.clone(),
+                                replacing: None,
+                            };
+                            list.push(Some(one));
+                        } else {
+                            list.push(None);
+                        }
                     }
+                    Entry::MultiLessons(list)
                 },
-                _ => unreachable!(),
             };
 
             table.add_entry(entry);
