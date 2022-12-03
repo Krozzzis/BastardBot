@@ -1,5 +1,3 @@
-mod table;
-mod parser;
+mod web_parser;
 
-pub use table::*;
-pub use parser::*;
+pub use web_parser::WebParser;

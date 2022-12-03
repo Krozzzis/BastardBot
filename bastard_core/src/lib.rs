@@ -1,5 +1,3 @@
-mod types;
-mod traits;
-
-pub use types::*;
-pub use traits::*;
+pub mod schedule_table;
+pub mod lesson;
+pub mod request_params;

@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
-use bastard_core::*;
+use serde::{Serialize, Deserialize};
+use bastard_core::schedule_table::{ScheduleTable, Entry};
+use bastard_core::lesson::Lesson;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RawLesson {
@@ -17,10 +18,10 @@ pub struct RawTable {
 }
 
 impl RawTable {
-    pub fn to_table(&self) -> Table {
-        let new = self.lessons.clone();
+    pub fn to_table(&self) -> ScheduleTable {
+        let new = &self.lessons;
 
-        let mut table = Table::new();
+        let mut table = ScheduleTable::new();
         for i in 1..=7 {
             let entry = new.iter().filter(|x| x.number == i).map(|x| x.clone()).collect::<Vec<RawLesson>>(); 
             let count = entry.len();
@@ -34,6 +35,7 @@ impl RawTable {
                         name: one.subject,
                         teacher: one.teacher,
                         auditory: one.auditory,
+                        replacing: None,
                     };
                     Entry::OneLesson(one)
                 },
@@ -43,18 +45,20 @@ impl RawTable {
                         name: one.subject,
                         teacher: one.teacher,
                         auditory: one.auditory,
+                        replacing: None,
                     };
                     let two = entry[1].clone();
                     let two = Lesson {
                         name: two.subject,
                         teacher: two.teacher,
                         auditory: two.auditory,
+                        replacing: None,
                     };
                     Entry::TwoLessons(Some(one), Some(two))
                 },
                 _ => unreachable!(),
             };
-            table.add_section(Section {entries: vec![entry]});
+            table.add_entry(entry);
         }
         return table;
     }
