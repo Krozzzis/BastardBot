@@ -1,9 +1,13 @@
 use bastard_core::schedule_table::{ScheduleTable, ScheduleTableFormatter, Entry};
 use bastard_core::lesson::{Lesson, LessonFormatter};
+use bastard_core::request_params::Group;
+use super::meal_schedule::{MealSchedule, MealTime};
 
 pub struct SimpleFormatter {
     lesson_formatter: Box<dyn LessonFormatter>,
-    timetable: Vec<(String, String)>,
+    timetable: Option<Vec<(String, String)>>,
+    meal_schedule: Option<MealSchedule>,
+    group: Group,
 }
 pub struct SimpleLessonFormatter {}
 
@@ -38,10 +42,12 @@ impl LessonFormatter for SimpleLessonFormatter {
 }
 
 impl SimpleFormatter {
-    pub fn new(timetable: Vec<(String, String)>) -> Self {
+    pub fn new(timetable: Option<Vec<(String, String)>>, meal_schedule: Option<MealSchedule>, group: Group) -> Self {
         Self {
             lesson_formatter: Box::new(SimpleLessonFormatter{}),
             timetable: timetable,
+            meal_schedule: meal_schedule,
+            group: group,
         }
     }
 
@@ -49,11 +55,15 @@ impl SimpleFormatter {
         format!("{} {}{}\n", indentation, changed, self.lesson_formatter.format_lesson(lesson))
     }
 
-    fn format_timetable(&self, place: usize) -> String {
-        if let Some((a, b)) = self.timetable.get(place) {
-            format!("[{}-{}]", a, b)
+    fn format_timetable(&self, place: usize) -> Option<String> {
+        if let Some(timetable) = &self.timetable {
+            if let Some((a, b)) = timetable.get(place) {
+                Some(format!("[{}-{}]", a, b))
+            } else {
+                Some(String::from(""))
+            }
         } else {
-            String::from("")
+            None
         }
     }
 }
@@ -63,7 +73,11 @@ impl ScheduleTableFormatter for SimpleFormatter {
         let mut output = String::new();
 
         for (i, entry) in (&table.entries).iter().enumerate() {
-            output += format!("{} Урок{}:\n", i+1, self.format_timetable(i).as_str()).as_str();
+            if let Some(time) = self.format_timetable(i) {
+                output += format!("{} Урок{}:\n", i+1, time.as_str()).as_str();
+            } else {
+                output += format!("{} Урок:\n", i+1).as_str();
+            }
             let changed_char = match table.replaced.get(i) {
                 Some(a) => match a {
                     Some(_) => "*",
@@ -96,6 +110,14 @@ impl ScheduleTableFormatter for SimpleFormatter {
                     }
                 },
             }
+            if let Some(meal_schedule) = &self.meal_schedule {
+                if let Some(meals) = meal_schedule.by_group(self.group) {
+                    for meal in meals.iter().filter(|x| x.place == i+1) {
+                        output += format!("--- {} ---\n", meal.kind).as_str();
+                    }
+                }
+            }
+                
         }
 
         return output;
