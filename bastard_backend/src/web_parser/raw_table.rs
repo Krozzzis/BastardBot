@@ -33,10 +33,7 @@ impl RawTable {
         let entry: Entry = match count {
             0 => Entry::NoLessons,
             1 => {
-                let lesson = match lessons.get(0) {
-                    Some(a) => a,
-                    None => return Err(String::new()),
-                };
+                let lesson = lessons.get(0).ok_or(String::new())?;
                 let one = (*lesson).to_lesson();
                 match lesson.subgroup {
                     0 => Entry::OneLesson(one),
@@ -46,10 +43,7 @@ impl RawTable {
             },
             _ => {
                 let mut list: Vec<Option<Lesson>> = Vec::new();
-                let max_subgroup: usize = match lessons.iter().max_by(|a, b| a.subgroup.cmp(&b.subgroup)) {
-                    Some(a) => a,
-                    None => return Err(String::new()),
-                }.subgroup as usize;
+                let max_subgroup: usize = lessons.iter().max_by(|a, b| a.subgroup.cmp(&b.subgroup)).ok_or(String::new())?.subgroup as usize;
 
                 for subgroup in 1..=max_subgroup {
                     if let Some(lesson) = lessons.get(subgroup - 1) {
@@ -72,14 +66,8 @@ impl RawTable {
         if self.lessons.len() == 0 {
             return Ok(table);
         }
-        let min_place: i32 = match self.lessons.iter().min_by(|a, b| a.number.cmp(&b.number)) {
-            Some(a) => a,
-            None => return Err(String::new()),
-        }.number;
-        let max_place: i32 = match self.lessons.iter().max_by(|a, b| a.number.cmp(&b.number)) {
-            Some(a) => a,
-            None => return Err(String::new()),
-        }.number;
+        let min_place: i32 = self.lessons.iter().min_by(|a, b| a.number.cmp(&b.number)).ok_or(String::new())?.number;
+        let max_place: i32 = self.lessons.iter().max_by(|a, b| a.number.cmp(&b.number)).ok_or(String::new())?.number;
 
         for place in min_place..=max_place {
             let lessons: Vec<&RawLesson> = self.lessons
