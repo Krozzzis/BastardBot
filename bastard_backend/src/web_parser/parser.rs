@@ -17,10 +17,21 @@ impl WebParser {
 }
 
 impl ScheduleTableGenerator for WebParser {
-    fn get_table(&self, group: Group, weekday: DayOfWeek) -> Result<ScheduleTable, ()> {
+    fn get_table(&self, group: Group, weekday: DayOfWeek) -> Result<ScheduleTable, String> {
         let url = self.get_request_url(group, weekday);
-        let body = reqwest::blocking::get(&url).expect("Oops, get error").text().unwrap();
-        let raw_table: RawTable = serde_json::from_str(&body).expect("Oops, parse error");
-        Ok(raw_table.to_table())
+        let body = match reqwest::blocking::get(&url) {
+            Ok(x) => {
+                match x.text() {
+                    Ok(a) => a,
+                    Err(_) => return Err(String::from("Fetch error")),
+                }
+            },
+            Err(_) => return Err(String::from("Fetch error"))
+        };
+        let raw_table: RawTable = match serde_json::from_str(&body) {
+            Ok(a) => a,
+            Err(_) => return Err(String::from("Parsing error")),
+        };
+        Ok(raw_table.to_table()?)
     }
 }

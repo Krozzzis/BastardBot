@@ -6,7 +6,6 @@ pub enum Entry {
     NoLessons,
     OneLesson(Lesson),
     MultiLessons(Vec<Option<Lesson>>),
-    Other(String),
 }
 
 #[derive(Debug, Clone)]
@@ -33,7 +32,7 @@ impl ScheduleTable  {
 }
 
 pub trait ScheduleTableGenerator {
-    fn get_table(&self, group: Group, weekday: DayOfWeek) -> Result<ScheduleTable, ()>;
+    fn get_table(&self, group: Group, weekday: DayOfWeek) -> Result<ScheduleTable, String>;
 }
 
 pub trait ScheduleTableFormatter {

@@ -5,7 +5,13 @@ use bastard_core::schedule_table::{ScheduleTableGenerator, ScheduleTableFormatte
 
 fn main() {
     let parser = WebParser::new("https://lyceum.urfu.ru/".to_string());
-    let table = parser.get_table(Group::_11N, DayOfWeek::Saturday).expect("Ooh, error");
+    let table = match parser.get_table(Group::_11N, DayOfWeek::Saturday) {
+        Ok(a) => a,
+        Err(e) => {
+            println!("⚠ Error: {}", e);
+            return
+        },
+    };
     let formatter = SimpleFormatter::new(
         vec![
             (String::from("9:00"), String::from("9:40")),

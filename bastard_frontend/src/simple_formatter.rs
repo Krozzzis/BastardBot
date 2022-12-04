@@ -49,8 +49,8 @@ impl SimpleFormatter {
         format!("{} {}{}\n", indentation, changed, self.lesson_formatter.format_lesson(lesson))
     }
 
-    fn format_timetable(&self, place: i32) -> String {
-        if let Some((a, b)) = self.timetable.get((place-1) as usize) {
+    fn format_timetable(&self, place: usize) -> String {
+        if let Some((a, b)) = self.timetable.get(place) {
             format!("[{}-{}]", a, b)
         } else {
             String::from("")
@@ -63,12 +63,15 @@ impl ScheduleTableFormatter for SimpleFormatter {
         let mut output = String::new();
 
         for (i, entry) in (&table.entries).iter().enumerate() {
-            output += format!("{} Урок{}:\n", i+1, self.format_timetable(i as i32+1).as_str()).as_str();
-            let changed_char = if let None = table.replaced[i] {
-                " "
-            } else {
-                "*"
+            output += format!("{} Урок{}:\n", i+1, self.format_timetable(i).as_str()).as_str();
+            let changed_char = match table.replaced.get(i) {
+                Some(a) => match a {
+                    Some(_) => "*",
+                    None => " ",
+                },
+                None => " ",
             };
+             
             match entry {
                 Entry::NoLessons => {
                     output += self.format_line(" ", changed_char, None).as_str();
@@ -92,10 +95,6 @@ impl ScheduleTableFormatter for SimpleFormatter {
                         }
                     }
                 },
-                Entry::Other(text) => {
-                    output += text;
-                    output += "\n";
-                }
             }
         }
 
