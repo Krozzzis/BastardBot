@@ -2,15 +2,26 @@
 name = "bastard"
 version = "0.1.0"
 edition = "2021"
+authors = ["krozzzis"]
 
 [workspace]
 members = [
-    "bastard_backend",
-    "bastard_frontend",
-    "bastard_core",
+    "telegram_system",
+    "timetable_system",
 ]
 
 [dependencies]
-bastard_backend = { path = "bastard_backend" }
-bastard_frontend = { path = "bastard_frontend" }
-bastard_core = { path = "bastard_core" }
+log = "0.4"
+pretty_env_logger = "0.4"
+toml = "0.5"
+serde = "1.0"
+
+telegram_system = { path = "telegram_system" }
+timetable_system = { path = "timetable_system" }
+
+[dependencies.tokio]
+version = "1.23"
+features = [
+    "rt-multi-thread",
+    "macros",
+]
