@@ -9,6 +9,8 @@ cargo build
 ```
 
 # Usage
+You need to write your telegram bot token to ```config.toml``` in ```telegram_token``` field.
+
 ```
 cargo run
 ```
